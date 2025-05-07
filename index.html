@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persona Generator Game</title>
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent: #bb86fc;
+            --accent-dark: #9d4edd;
+            --success: #03dac6;
+            --error: #cf6679;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+        
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+        }
+        
+        .persona-text {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .button {
+            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .button:active {
+            transform: translateY(1px);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .info-button {
+            background-color: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .info-button:hover {
+            background-color: rgba(187, 134, 252, 0.1);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+        }
+        
+        .modal-section {
+            margin-bottom: 20px;
+        }
+        
+        .modal-section h3 {
+            color: var(--success);
+            margin-bottom: 10px;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .persona-text {
+                font-size: 1.2rem;
+            }
+            
+            .button {
+                padding: 10px 25px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .persona-text {
+                font-size: 1.1rem;
+            }
+            
+            .button {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .hint-section {
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        .hint-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .hint-button {
+            background-color: rgba(187, 134, 252, 0.2);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .hint-button:hover {
+            background-color: rgba(187, 134, 252, 0.3);
+        }
+
+        .hint-text {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Persona Generator Game</h1>
+            <p class="subtitle">Generate bizarre character personas for your guessing game</p>
+        </header>
+        
+        <div class="card">
+            <div id="persona" class="persona-text">
+                Press the button below to generate your first persona!
+            </div>
+            <div class="hint-section">
+                <div class="hint-buttons">
+                    <button id="showRole" class="hint-button">Reveal Role</button>
+                    <button id="showSecret" class="hint-button">Reveal Secret</button>
+                </div>
+                <div id="roleHint" class="hint-text"></div>
+                <div id="secretHint" class="hint-text"></div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button id="generateBtn" class="button pulse">Generate Persona</button>
+            <button id="rulesBtn" class="info-button">Game Rules</button>
+        </div>
+    </div>
+    
+    <div id="rulesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title">How To Play</h2>
+            
+            <div class="modal-section">
+                <h3>Goal</h3>
+                <p>The goal is for players to guess the role/occupation/character and secret of the randomly generated persona.</p>
+            </div>
+            
+            <div class="modal-section">
+                <h3>Gameplay</h3>
+                <ol>
+                    <li>Generate a random persona using the "Generate Persona" button.</li>
+                    <li>One player reads the persona description out loud, but omits the role/occupation/character and secret.</li>
+                    <li>The other players must guess what the persona's role/occupation/character is and what their secret is.</li>
+                    <li>Use the "Reveal Role" and "Reveal Secret" buttons to check if guesses were correct.</li>
+                    <li>Players can decide their own scoring system and number of rounds.</li>
+                </ol>
+            </div>
+            
+            <div class="modal-section">
+                <h3>Example Persona</h3>
+                <p>"A Middle-Aged Adult Conspiracy Theorist with a speech impediment who constantly talks about aliens.</p>
+                <p>Their big secret is: They work for the government agency they constantly rant about."</p>
+                <p><strong>Players would need to guess:</strong> "Conspiracy Theorist" and "Works for the government agency they constantly rant about"</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        Created for fun social games - Play responsibly!
+    </footer>
+
+    <script>
+        // Game data
+        const personaData = {
+            age: [
+                "Young", "Teenage", "Young Adult", "Adult", "Middle-Aged", "Elderly"
+            ],
+            role: [
+                "Conspiracy Theorist", "Undercover Cop", "Social Media Influencer", "Celebrity Impersonator", 
+                "Failed Entrepreneur", "Washed-up Athlete", "Wannabe Superhero", "Time Traveler", 
+                "Amateur Detective", "Medieval Knight", "Self-proclaimed Prophet", "Game Show Host", 
+                "Alien Disguised as Human", "Corporate Executive", "Struggling Artist", "Zoo Keeper", 
+                "Fast Food Worker", "Professional Gamer", "Retired Spy", "Substitute Teacher",
+                "Daffy Duck", "Former Child Star", "Street Performer", "Mad Scientist", 
+                "Yoga Instructor", "Amateur Magician", "Imaginary Friend", "Folk Singer", 
+                "Reality TV Contestant", "Volunteer Firefighter", "Circus Performer", "Internet Troll"
+            ],
+            trait1: [
+                "with Tourette's", "with a food addiction", "with a speech impediment", 
+                "with strong antisocial tendencies", "who can't stop dancing", "who speaks in rhymes", 
+                "who believes they're invisible", "who can only whisper", "who talks to inanimate objects", 
+                "who thinks they're always on camera", "with an imaginary friend", "who narrates their own life", 
+                "who only speaks in movie quotes", "who is afraid of the color blue", "who constantly changes accents", 
+                "who thinks they can read minds", "who can't remember names", "who speaks in third person", 
+                "with an obsession for collecting spoons", "who thinks they're in a simulation"
+            ],
+            trait2: [
+                "and anger problems", "and unable to speak English very well", "but doesn't want anybody to find out", 
+                "and constantly talks about aliens", "and thinks everyone is out to get them", "and can't stop lying", 
+                "and pretends to be rich", "and thinks they're much younger than they are", "and cries at the slightest inconvenience", 
+                "and believes they have superpowers", "and starts every sentence with 'technically'", "and falls in love with everyone they meet", 
+                "and constantly checks their phone", "and laughs at inappropriate times", "and sings instead of speaking", 
+                "and always speaks in questions", "and thinks today is their birthday", "and can't make decisions", 
+                "and believes they're from the future", "and randomly breaks into dance"
+            ],
+            secret: [
+                "is actually in the interviewer's imagination", "is addicted to murdering people", 
+                "is actually the Secret Millionaire", "has never left their hometown", "is actually a ghost", 
+                "is writing a tell-all book about everyone they meet", "has a collection of stolen traffic cones", 
+                "works for the government agency they constantly rant about", "is three children in a trenchcoat", 
+                "doesn't actually exist", "is planning to fake their own death", "can actually talk to animals", 
+                "is secretly royalty in hiding", "is living under a false identity", "is allergic to their favorite food", 
+                "has never seen a movie in their life", "is building a time machine in their basement", 
+                "has been abducted by aliens multiple times", "is actually a robot from the future", 
+                "is living in the wrong timeline"
+            ]
+        };
+
+        // DOM elements
+        const generateBtn = document.getElementById('generateBtn');
+        const personaText = document.getElementById('persona');
+        const rulesBtn = document.getElementById('rulesBtn');
+        const rulesModal = document.getElementById('rulesModal');
+        const closeBtn = document.querySelector('.close');
+        const showRoleBtn = document.getElementById('showRole');
+        const showSecretBtn = document.getElementById('showSecret');
+        const roleHint = document.getElementById('roleHint');
+        const secretHint = document.getElementById('secretHint');
+
+        // Current persona data
+        let currentPersona = {
+            age: "",
+            role: "",
+            trait1: "",
+            trait2: "",
+            secret: ""
+        };
+
+        // Functions
+        function getRandomElement(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function generatePersona() {
+            // Clear previous hints
+            roleHint.style.display = 'none';
+            secretHint.style.display = 'none';
+            
+            // Generate new persona
+            currentPersona = {
+                age: getRandomElement(personaData.age),
+                role: getRandomElement(personaData.role),
+                trait1: getRandomElement(personaData.trait1),
+                trait2: getRandomElement(personaData.trait2),
+                secret: getRandomElement(personaData.secret)
+            };
+
+            // Determine if we need "A" or "An"
+            const article = /^[aeiou]/i.test(currentPersona.age) ? "An" : "A";
+            
+            // Display the new persona
+            personaText.innerHTML = `${article} <span class="highlight">${currentPersona.age}</span> <span class="highlight">${currentPersona.role}</span> ${currentPersona.trait1} ${currentPersona.trait2}.<br><br>Their big secret is: <span class="highlight">${currentPersona.secret}</span>`;
+            
+            // Update hint text
+            roleHint.textContent = `Role/Character: ${currentPersona.role}`;
+            secretHint.textContent = `Secret: ${currentPersona.secret}`;
+            
+            // Remove pulse animation once first persona is generated
+            generateBtn.classList.remove('pulse');
+        }
+
+        // Event listeners
+        generateBtn.addEventListener('click', generatePersona);
+        
+        rulesBtn.addEventListener('click', () => {
+            rulesModal.style.display = 'flex';
+        });
+        
+        closeBtn.addEventListener('click', () => {
+            rulesModal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === rulesModal) {
+                rulesModal.style.display = 'none';
+            }
+        });
+        
+        showRoleBtn.addEventListener('click', () => {
+            if (currentPersona.role) {
+                roleHint.style.display = roleHint.style.display === 'block' ? 'none' : 'block';
+            } else {
+                alert('Generate a persona first!');
+            }
+        });
+        
+        showSecretBtn.addEventListener('click', () => {
+            if (currentPersona.secret) {
+                secretHint.style.display = secretHint.style.display === 'block' ? 'none' : 'block';
+            } else {
+                alert('Generate a persona first!');
+            }
+        });
+    </script>
+</body>
+</html>
